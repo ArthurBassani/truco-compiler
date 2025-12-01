@@ -1,0 +1,12 @@
+// Classe
+carteado Aluno desce
+
+	espadilha nome pato
+	publico copa idade pato
+	privado gato media pato
+
+	publico vai gato pegaMedia passa sinal desce
+		facao media pato
+	sobe
+
+sobe
