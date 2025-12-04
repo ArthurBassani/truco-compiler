@@ -12,12 +12,12 @@ PARSER_BEGIN(TrucoCompiler)
 package compiler;
 
 import recovery.*;
-
 public class TrucoCompiler/*@bgen(jjtree)*/implements TrucoCompilerTreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
   protected static JJTTrucoCompilerState jjtree = new JJTTrucoCompilerState();
 
 /*@egen*/
+  static boolean lastRecoverySuccessful = false;
   public static void main(String args []) throws ParseException
   {
     TrucoCompiler parser = new TrucoCompiler(System.in);
@@ -112,7 +112,7 @@ public class TrucoCompiler/*@bgen(jjtree)*/implements TrucoCompilerTreeConstants
 	
   // o m\u00e9todo abaixo consome tokens at\u00e9 alcan\u00e7ar um que perten\u00e7a ao conjunto
   // de sincroniza\u00e7\u00e3o
-  static void consumeUntil(RecoverySet g,
+  static boolean consumeUntil(RecoverySet g,
 	                 ParseException e,
 	                 String met) throws ParseEOFException,
 	                                    ParseException
@@ -133,7 +133,8 @@ public class TrucoCompiler/*@bgen(jjtree)*/implements TrucoCompilerTreeConstants
 	    System.out.println("     Encontrado token de sincroniza\u00e7\u00e3o: " + 
 	                       im(tok.kind));
 		ErrorHandler.addError("\u2713 Encontrado token de sincroniza\u00e7\u00e3o: " + im(tok.kind));
-	    break;
+        lastRecoverySuccessful = true;
+	    return true;
 	  }
 	  ErrorHandler.addError("\u2717 Ignorando token: " + im(tok.kind));
 	  System.out.println("     Ignorando o token: " + im(tok.kind));
@@ -146,10 +147,13 @@ public class TrucoCompiler/*@bgen(jjtree)*/implements TrucoCompilerTreeConstants
 	  System.out.println(e.getMessage());
 	  ErrorHandler.addError("\n" + formatErrorMessage(e));
 	  lastError = tok;
-	   
 	}
+	
+    lastRecoverySuccessful = false;
 	if ( eof )
 	  throw new ParseEOFException("Encontrei EOF onde n\u00e3o deveria.");
+
+	return false;
   }
 
   static String formatErrorMessage(ParseException e) {
@@ -303,13 +307,13 @@ void main():
   SimpleNode jjtn000 = new SimpleNode(JJTMAIN);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/ RecoverySet sinc = First.main; }
+/*@egen*/ RecoverySet sinc = Follow.main; }
 {/*@bgen(jjtree) main */
   try {
 /*@egen*/
   try {
     startPrograma() abreChave()
-		(bloco())*
+		blocos()
   	fechaChave()
   } catch(ParseException e) {
 	consumeUntil(sinc, e, "main");
@@ -488,6 +492,38 @@ void expLog() :
         try {
 /*@egen*/
  	expArit() opLog() expArit()/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void expAritOrLog():
+{/*@bgen(jjtree) expAritOrLog */
+  SimpleNode jjtn000 = new SimpleNode(JJTEXPARITORLOG);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/ }
+{/*@bgen(jjtree) expAritOrLog */
+        try {
+/*@egen*/
+	expArit() [opLog() expArit()]/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -749,10 +785,11 @@ void termo() :
   SimpleNode jjtn000 = new SimpleNode(JJTTERMO);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+/*@egen*/ RecoverySet sinc = Follow.termo; }
 {/*@bgen(jjtree) termo */
-        try {
+  try {
 /*@egen*/
+  try {
   	( ident() [ acessaVetor() ]
   	| nulo()
   	| boolTrue()
@@ -760,26 +797,29 @@ void termo() :
 	| string()
 	| numero()
 	| _chamaFuncao()
-	)/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
+	)
+  } catch(ParseException e) {
+	consumeUntil(sinc, e, "termo");
+  }/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
 /*@egen*/
 }
 
@@ -794,7 +834,7 @@ void atribui() :
 {/*@bgen(jjtree) atribui */
         try {
 /*@egen*/
-	atrivar() ( atribuiVetor() | expArit() )/*@bgen(jjtree)*/
+	atrivar() ( atribuiVetor() | expAritOrLog() )/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -861,7 +901,7 @@ void condicional():
         try {
 /*@egen*/
 	cond() abrePar() expCond() fechaPar() abreChave()
-		(bloco())*
+		blocos()
 	 fechaChave()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -898,7 +938,7 @@ void lacoRep() :
 /*@egen*/
    tFor() abrePar() bloco() expLog() fimInst() bloco() fechaPar()
   	abreChave()
-		(bloco())*
+		blocos()
 	 fechaChave()/*@bgen(jjtree)*/
    } catch (Throwable jjte000) {
      if (jjtc000) {
@@ -931,7 +971,7 @@ void lacoRep3() :
 {/*@bgen(jjtree) lacoRep3 */
         try {
 /*@egen*/
-	tRep3() abreChave() (bloco())* fechaChave()/*@bgen(jjtree)*/
+	tRep3() abreChave() blocos() fechaChave()/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1063,7 +1103,7 @@ void declFuncao() :
 /*@egen*/
   tDeclFunc() tipoDado() ident()
   		abrePar() (declVar())* fechaPar()
-		abreChave() (bloco())* fechaChave()/*@bgen(jjtree)*/
+		abreChave() blocos() fechaChave()/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -1089,6 +1129,44 @@ void declFuncao() :
 
 // BLOCOS
 
+void blocos():
+{/*@bgen(jjtree) blocos */
+  SimpleNode jjtn000 = new SimpleNode(JJTBLOCOS);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/ RecoverySet sinc = Follow.blocos; }
+{/*@bgen(jjtree) blocos */
+        try {
+/*@egen*/
+  	(
+	  try {
+	  	bloco()
+	  } catch(ParseException e) {
+		consumeUntil(sinc, e, "blocos");
+	  }
+ 	)*/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
 void bloco() :
 {/*@bgen(jjtree) bloco */
   SimpleNode jjtn000 = new SimpleNode(JJTBLOCO);
@@ -1096,36 +1174,36 @@ void bloco() :
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
 {/*@bgen(jjtree) bloco */
-  try {
+          try {
 /*@egen*/
-  ( declVar()
-  | identificador()
-  | condicional()
-  | lacoRep()
-  | lacoRep3()
-  | declFuncao()
-  | retorna()
-  | chamaFuncao()
-  )/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
+	  ( declVar()
+	  | identificador()
+	  | condicional()
+	  | lacoRep()
+	  | lacoRep3()
+	  | declFuncao()
+	  | retorna()
+	  | chamaFuncao()
+	  )/*@bgen(jjtree)*/
+          } catch (Throwable jjte000) {
+            if (jjtc000) {
+              jjtree.clearNodeScope(jjtn000);
+              jjtc000 = false;
+            } else {
+              jjtree.popNode();
+            }
+            if (jjte000 instanceof RuntimeException) {
+              throw (RuntimeException)jjte000;
+            }
+            if (jjte000 instanceof ParseException) {
+              throw (ParseException)jjte000;
+            }
+            throw (Error)jjte000;
+          } finally {
+            if (jjtc000) {
+              jjtree.closeNodeScope(jjtn000, true);
+            }
+          }
 /*@egen*/
 }
 

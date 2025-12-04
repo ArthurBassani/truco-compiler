@@ -4,6 +4,8 @@ import compiler.*;
 
 public class Follow {
     static public final RecoverySet main = new RecoverySet();
+    static public final RecoverySet bloco = new RecoverySet();
+    static public final RecoverySet blocos = new RecoverySet();
     static public final RecoverySet opArit = new RecoverySet();
     static public final RecoverySet opLog = new RecoverySet();
     static public final RecoverySet opCond = new RecoverySet();
@@ -29,6 +31,38 @@ public class Follow {
     static {
     	main.add(TrucoCompilerConstants.EOF);
     	
+    	bloco.add(TrucoCompiler.FECHAVE);
+    	bloco.add(TrucoCompiler.FECHAPAR);
+    	bloco.addAll(First.expLog);
     	
+    	opArit.add(TrucoCompiler.ABREPAR);
+    	opArit.addAll(First.termo);
+
+    	opLog.addAll(First.expArit);
+    	
+    	opCond.add(TrucoCompiler.ABREPAR);
+    	opCond.addAll(First.expLog);
+    	
+    	chamaFuncao.add(TrucoCompiler.FIMINST);
+    	
+    	tipoDado.add(TrucoCompiler.IDENT);
+    	
+    	acessaVetor.addAll(First.atribui);
+    	
+    	atribui.add(TrucoCompiler.FIMINST);
+    	
+    	termo.add(TrucoCompiler.FIMINST);
+    	termo.add(TrucoCompiler.FECHAVE);
+    	termo.add(TrucoCompiler.FECHAPAR);
+    	termo.addAll(First.opLog);
+    	
+    	
+    	expArit.addAll(First.opLog);
+    	expArit.add(TrucoCompiler.FIMINST);
+    	expLog.add(TrucoCompiler.FIMINST);
+    	
+    	blocos.addAll(First.bloco);
+    	blocos.addAll(bloco);
+ 
     }
 }

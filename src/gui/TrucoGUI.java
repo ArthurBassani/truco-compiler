@@ -298,23 +298,6 @@ public class TrucoGUI extends JFrame {
         treePanel.setTree(root);
     }
     
-    private void simulateCompilation(String code) {
-        tokensArea.append("=== TOKENS RECONHECIDOS ===\n");
-        tokensArea.append("Token: PROGRAM | Linha: 1\n");
-        tokensArea.append("Token: IDENTIFIER (main) | Linha: 1\n");
-        tokensArea.append("Token: BEGIN | Linha: 2\n");
-        tokensArea.append("Token: END | Linha: " + codeEditor.getLineCount() + "\n");
-        
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Program");
-        DefaultMutableTreeNode main = new DefaultMutableTreeNode("Main");
-        DefaultMutableTreeNode body = new DefaultMutableTreeNode("Body");
-        root.add(main);
-        main.add(body);
-        treePanel.setTree(root);
-        
-        updateStatus("Status: CÓDIGO ACEITO ✓", new Color(100, 200, 100));
-    }
-    
     private void clearAll() {
         codeEditor.clear();
         clearOutput();
@@ -349,9 +332,9 @@ public class TrucoGUI extends JFrame {
             this,
             "Compilador Truco\n" +
             "Análise Léxica e Sintática\n\n" +
-            "Desenvolvido para a disciplina de Compiladores\n" +
+            "Desenvolvido para a disciplina de Construção de Compiladores\n" +
             "JavaCC + JJTree\n\n" +
-            "2024",
+            "2025",
             "Sobre",
             JOptionPane.INFORMATION_MESSAGE
         );

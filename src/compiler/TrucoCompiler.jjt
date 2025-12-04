@@ -11,9 +11,9 @@ PARSER_BEGIN(TrucoCompiler)
 package compiler;
 
 import recovery.*;
-
 public class TrucoCompiler
 {
+  static boolean lastRecoverySuccessful = false;
   public static void main(String args []) throws ParseException
   {
     TrucoCompiler parser = new TrucoCompiler(System.in);
@@ -108,7 +108,7 @@ public class TrucoCompiler
 	
   // o método abaixo consome tokens até alcançar um que pertença ao conjunto
   // de sincronização
-  static void consumeUntil(RecoverySet g,
+  static boolean consumeUntil(RecoverySet g,
 	                 ParseException e,
 	                 String met) throws ParseEOFException,
 	                                    ParseException
@@ -129,7 +129,8 @@ public class TrucoCompiler
 	    System.out.println("     Encontrado token de sincronização: " + 
 	                       im(tok.kind));
 		ErrorHandler.addError("✓ Encontrado token de sincronização: " + im(tok.kind));
-	    break;
+        lastRecoverySuccessful = true;
+	    return true;
 	  }
 	  ErrorHandler.addError("✗ Ignorando token: " + im(tok.kind));
 	  System.out.println("     Ignorando o token: " + im(tok.kind));
@@ -142,10 +143,13 @@ public class TrucoCompiler
 	  System.out.println(e.getMessage());
 	  ErrorHandler.addError("\n" + formatErrorMessage(e));
 	  lastError = tok;
-	   
 	}
+	
+    lastRecoverySuccessful = false;
 	if ( eof )
 	  throw new ParseEOFException("Encontrei EOF onde não deveria.");
+
+	return false;
   }
 
   static String formatErrorMessage(ParseException e) {
@@ -264,11 +268,11 @@ SimpleNode Start() #Start :
 }
 
 void main():
-{ RecoverySet sinc = First.main; }
+{ RecoverySet sinc = Follow.main; }
 {
   try {
     startPrograma() abreChave()
-		(bloco())*
+		blocos()
   	fechaChave()
   } catch(ParseException e) {
 	consumeUntil(sinc, e, "main");
@@ -317,6 +321,12 @@ void expLog() :
 {}
 {
  	expArit() opLog() expArit()
+}
+
+void expAritOrLog():
+{ }
+{
+	expArit() [opLog() expArit()]
 }
 
 void expCond():
@@ -372,8 +382,9 @@ void numero() :
 }
 
 void termo() :
-{}
+{ RecoverySet sinc = Follow.termo; }
 {
+  try {
   	( ident() [ acessaVetor() ]
   	| nulo()
   	| boolTrue()
@@ -382,6 +393,9 @@ void termo() :
 	| numero()
 	| _chamaFuncao()
 	)
+  } catch(ParseException e) {
+	consumeUntil(sinc, e, "termo");
+  }
 }
 
 // ATRIBUIÇÕES
@@ -389,7 +403,7 @@ void termo() :
 void atribui() :
 {}
 {
-	atrivar() ( atribuiVetor() | expArit() )
+	atrivar() ( atribuiVetor() | expAritOrLog() )
 }
 
 void atribuiVetor() :
@@ -404,7 +418,7 @@ void condicional():
 {}
 {
 	cond() abrePar() expCond() fechaPar() abreChave()
-		(bloco())*
+		blocos()
 	 fechaChave()
 }
 
@@ -415,14 +429,14 @@ void lacoRep() :
 {
    tFor() abrePar() bloco() expLog() fimInst() bloco() fechaPar()
   	abreChave()
-		(bloco())*
+		blocos()
 	 fechaChave()
 }
  
 void lacoRep3() :
 {}
 {
-	tRep3() abreChave() (bloco())* fechaChave()
+	tRep3() abreChave() blocos() fechaChave()
 }
 
 // FUNÇÕES
@@ -450,24 +464,36 @@ void declFuncao() :
 {
   tDeclFunc() tipoDado() ident()
   		abrePar() (declVar())* fechaPar()
-		abreChave() (bloco())* fechaChave()
+		abreChave() blocos() fechaChave()
 }
 
 
 // BLOCOS
 
+void blocos():
+{ RecoverySet sinc = Follow.blocos; }
+{
+  	(
+	  try {
+	  	bloco()
+	  } catch(ParseException e) {
+		consumeUntil(sinc, e, "blocos");
+	  }
+ 	)*
+}
+
 void bloco() :
 {}
 {
-  ( declVar()
-  | identificador()
-  | condicional()
-  | lacoRep()
-  | lacoRep3()
-  | declFuncao()
-  | retorna()
-  | chamaFuncao()
-  )
+	  ( declVar()
+	  | identificador()
+	  | condicional()
+	  | lacoRep()
+	  | lacoRep3()
+	  | declFuncao()
+	  | retorna()
+	  | chamaFuncao()
+	  )
 }
 
 // TOKENS

@@ -25,6 +25,7 @@ public class First {
     static public final RecoverySet expLog = new RecoverySet();
     static public final RecoverySet expCond = new RecoverySet();
     static public final RecoverySet acessaVetor = new RecoverySet();
+    static public final RecoverySet bloco = new RecoverySet();
 
     static {
     	main.add(TrucoCompilerConstants.STARTPROGRAMA);
@@ -81,6 +82,17 @@ public class First {
     	expLog.addAll(expArit);
     	expCond.addAll(expLog);
     	
-    	
+    	bloco.addAll(declVar);
+    	bloco.addAll(identificador);
+    	bloco.addAll(condicional);
+    	bloco.addAll(lacoRep);
+    	bloco.addAll(lacoRep3);
+    	bloco.addAll(declFuncao);
+    	bloco.addAll(retorna);
+    	bloco.addAll(chamaFuncao);
+
     }
 }
+
+
+

@@ -3,7 +3,6 @@ package compiler;
 import gui.TrucoGUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.StringReader;
-import recovery.*;
 
 public class ParserIntegration {
     
@@ -13,6 +12,8 @@ public class ParserIntegration {
         gui.appendToken("=== INICIANDO COMPILAÇÃO ===\n");
         ErrorHandler.setGUI(gui);
         try {
+        	extractTokens(code, gui);
+        	
             StringReader reader = new StringReader(code);
             
             if (parser == null) {
@@ -24,9 +25,7 @@ public class ParserIntegration {
             TrucoCompiler.lastError = null;
             TrucoCompiler.eof = false;
             
-            SimpleNode root = TrucoCompiler.Start();
-            
-            extractTokens(parser, gui);
+            SimpleNode root = parser.Start();
             
             buildSyntaxTree(root, gui);
             
@@ -53,16 +52,28 @@ public class ParserIntegration {
         }
     }
     
-    private static void extractTokens(TrucoCompiler parser, TrucoGUI gui) {
+    private static void extractTokens(String code, TrucoGUI gui) {
         try {
-            Token token = parser.token;
-            if (token == null) {
-                token = parser.getNextToken();
+            gui.appendToken("\n--- ANÁLISE LÉXICA ---\n");
+            
+            // Criar um parser temporário só para tokens
+            StringReader reader = new StringReader(code);
+            
+            if (parser == null) {
+                parser = new TrucoCompiler(reader);
+            } else {
+                TrucoCompiler.ReInit(reader);
             }
             
+            Token token;
             int lastLine = -1;
+            int tokenCount = 0;
             
-            while (token != null) {
+            // Iterar sobre todos os tokens
+            while (true) {
+                token = parser.getNextToken();
+                
+                // Parar no EOF
                 if (token.kind == TrucoCompilerConstants.EOF) {
                     break;
                 }
@@ -72,7 +83,8 @@ public class ParserIntegration {
                 int line = token.beginLine;
                 int column = token.beginColumn;
                 
-                if (line != lastLine && lastLine != -1) {
+                // Adicionar linha em branco entre linhas diferentes
+                if (lastLine != -1 && line != lastLine) {
                     gui.appendToken("");
                 }
                 lastLine = line;
@@ -80,11 +92,18 @@ public class ParserIntegration {
                 gui.appendToken(String.format("%-20s | Valor: %-15s | Linha: %3d | Coluna: %3d",
                     tokenName, tokenValue, line, column));
                 
-                token = token.next;
-                if (token == null) break;
+                tokenCount++;
             }
+            
+            gui.appendToken("\nTotal de tokens: " + tokenCount);
+            gui.appendToken("--- FIM DA ANÁLISE LÉXICA ---\n");
+            
+        } catch (TokenMgrError e) {
+            gui.appendError("\nERRO LÉXICO durante extração de tokens:");
+            gui.appendError("  " + e.getMessage());
         } catch (Exception e) {
-            gui.appendError("Erro ao extrair tokens: " + e.getMessage());
+            gui.appendError("\nErro ao extrair tokens: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
