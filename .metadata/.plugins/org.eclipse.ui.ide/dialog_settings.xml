@@ -6,6 +6,7 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="/home/arthur/utfpr/6-periodo/construcao-compiladores/TrucoCompiler"/>
 			<item value="/home/arthur/utfpr/6_periodo/construcao-compiladores/TrucoCompiler"/>
 			<item value="/home/arthur/eclipse-workspace/TrucoCompiler"/>
 			<item value="/home/arthur/eclipse-workspace"/>

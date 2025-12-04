@@ -1,0 +1,19 @@
+// CLASSE
+
+void modAcesso() :
+{}
+{
+  ( modPrivado()
+  | modPublico()
+  )
+}
+
+void declClasse(): { } { < DECLASSE > }
+
+void deClasse() :
+{}
+{
+  declClasse() ident() abreChave()
+	( [ modAcesso() ] ( declVar() | declFuncao() ) )*
+  fechaChave()
+}

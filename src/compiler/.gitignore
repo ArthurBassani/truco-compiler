@@ -5,3 +5,8 @@
 /TrucoCompiler.java
 /TrucoCompilerConstants.java
 /TrucoCompilerTokenManager.java
+/JJTTrucoCompilerState.java
+/Node.java
+/SimpleNode.java
+/TrucoCompiler.jj
+/TrucoCompilerTreeConstants.java
