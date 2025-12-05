@@ -11,6 +11,8 @@ PARSER_BEGIN(TrucoCompiler)
 package compiler;
 
 import recovery.*;
+import error.*;
+
 public class TrucoCompiler
 {
   static boolean lastRecoverySuccessful = false;
@@ -25,14 +27,6 @@ public class TrucoCompiler
       try
       {
        	SimpleNode n = parser.Start();
-		n.dump(" ");
-       	
-      }
-      catch(LexicalException e)
-      {
-        System.out.println("");
-        System.out.println("Algo de errado não está certo...");
-        System.out.println(e.getMessage());
       }
       catch(ParseException e)
       {
@@ -67,20 +61,9 @@ public class TrucoCompiler
       }
       catch (Error e)
       {
-        String msg = e.getMessage();
-		System.out.println("");
-        if(msg.contains("Lexical error")) {
-        	System.out.println("Algo de errado não está certo...");
-        	String msgPtBr = msg.replace("Lexical error", "Erro Léxico\n")
-								.replace("at line", "Linha:")
-								.replace(", column",".\n Coluna:")
-								.replace("Encountered: ", "\n Tu mandou essa bomba");
-			System.out.println(msgPtBr);
-        }else {
-	        System.out.println("Agora fudeu");
-	        System.out.println(e.getMessage());
-        }
-
+		
+        System.out.println("Algo de errado não está certo...");
+		System.out.println(ErrorMessages.generateLexicalError(e));
         break;
       }
       finally
@@ -263,11 +246,11 @@ TOKEN :
 SimpleNode Start() #Start :
 { }
 {
-	main()
+	program()
 	{ return jjtThis; }
 }
 
-void main():
+void program():
 { RecoverySet sinc = Follow.main; }
 {
   try {
@@ -275,6 +258,7 @@ void main():
 		blocos()
   	fechaChave()
   } catch(ParseException e) {
+	ErrorHandler.addError(formatErrorMessage(e));
 	consumeUntil(sinc, e, "main");
   }
 }
@@ -394,6 +378,7 @@ void termo() :
 	| _chamaFuncao()
 	)
   } catch(ParseException e) {
+    ErrorHandler.addError(formatErrorMessage(e));
 	consumeUntil(sinc, e, "termo");
   }
 }
@@ -477,6 +462,7 @@ void blocos():
 	  try {
 	  	bloco()
 	  } catch(ParseException e) {
+	    ErrorHandler.addError(formatErrorMessage(e));
 		consumeUntil(sinc, e, "blocos");
 	  }
  	)*

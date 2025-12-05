@@ -1,0 +1,87 @@
+// Programa main
+tresehojogo desce
+
+	// Declaração Variável
+	copa numAlunos pato
+	gato notaTotal pato
+	gato mediaMin pato
+
+	// Atribuição de Variável
+	numAlunos receba 10 pato
+	mediaMin receba 6.5 pato
+
+	// Declaração e Atribuição
+	copa qtdProvas receba 3 pato
+	mole aprovado receba corre pato
+	espadilha nomeAluno receba 'ZAPPE' pato
+
+	// Declaração de vetor
+	manilha espadilha vCaracteres pato
+
+	// Declaração de vetor com atribuição
+	manilha gato notas receba desce
+			7.1 pato 5.3 pato 10
+	sobe pato
+
+	// Condicional Simples - 1 Operador Lógico
+	parceiro passa numAlunos igual 10 sinal desce
+		facao nada pato
+	sobe
+
+	// Condicional Intermediário - +1 Operador Lógico
+	parceiro passa numAlunos maior 50 e nomeAluno diferente 'EUSTÁQUIO' ou qtdProvas menor 1 sinal desce
+		facao 'Mto aluno sai fora' pato
+	sobe
+
+	// Condicional Avançado - +1 Operador Lógico e Parênteses Entre as Lógicas
+	parceiro passa aprovado igual joga e passa mediaMin maior 10 ou mediaMin menor 0 sinal sinal desce
+		facao 'Deixa quieto' pato
+	sobe
+
+	// Laço de Repetição (FOR)
+	torna passa
+		copa i receba 0 pato
+		i menor qtdProvas pato
+		i receba i mais 1 pato
+	sinal
+	desce
+		notaTotal receba notaTotal mais notas:i pato
+	sobe
+
+	gato media receba notaTotal div qtdProvas pato
+
+	parceiro passa media maior mediaMin sinal desce
+		facao 'VAMOOO' pato
+	sobe
+
+	// Recuperação
+
+	manilha gato notasRecuperacao pato
+
+	// Repete 3 vezes
+	copa j receba 0 pato
+	notaTotal receba 0 pato
+	come3 desce
+		notasRecuperacao:j receba j mul 3 pato
+		notaTotal receba notaTotal mais notasRecuperacao:j pato
+	sobe
+
+	parceiro passa notaTotal div qtdProvas maior mediaMin sinal desce
+		facao 'Pelo menos na recuperação né' pato
+	sobe
+
+	sobe
+
+	// Declaração de função
+	vai gato aumenta10porcento passa gato n pato sinal desce
+		facao n mul 1.1 pato
+	sobe
+
+	// Chamada de função
+	gato ultimaChance receba vem aumenta10porcento passa notaTotal sinal div qtdProvas pato
+
+	parceiro passa ultimaChance menor mediaMin sinal desce
+		facao 'Acho que não é pra vc mesmo em ' mais nomeAluno pato
+	sobe
+
+sobe

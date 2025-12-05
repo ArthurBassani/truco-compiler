@@ -3,6 +3,8 @@ package compiler;
 import gui.TrucoGUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.StringReader;
+import error.*
+;
 
 public class ParserIntegration {
     
@@ -41,9 +43,8 @@ public class ParserIntegration {
             gui.setAccepted(false);
             
         } catch (TokenMgrError e) {
-            gui.appendError("ERRO LÉXICO na linha " + extractLineFromError(e.getMessage()));
-            gui.appendError("  " + e.getMessage());
-            gui.setAccepted(false);
+            gui.appendError(ErrorMessages.generateLexicalError(e));
+        	gui.setAccepted(false);
             
         } catch (Exception e) {
             gui.appendError("ERRO INESPERADO: " + e.getMessage());
@@ -99,8 +100,7 @@ public class ParserIntegration {
             gui.appendToken("--- FIM DA ANÁLISE LÉXICA ---\n");
             
         } catch (TokenMgrError e) {
-            gui.appendError("\nERRO LÉXICO durante extração de tokens:");
-            gui.appendError("  " + e.getMessage());
+        	gui.appendError(ErrorMessages.generateLexicalError(e));
         } catch (Exception e) {
             gui.appendError("\nErro ao extrair tokens: " + e.getMessage());
             e.printStackTrace();
@@ -164,9 +164,8 @@ public class ParserIntegration {
             ));
         } else {
             gui.appendError("ERRO SINTÁTICO:");
+            gui.appendError("  " + cleanErrorMessage(e.getMessage()));
         }
-        
-        gui.appendError("  " + cleanErrorMessage(e.getMessage()));
         
         if (e.expectedTokenSequences != null && e.expectedTokenSequences.length > 0) {
             gui.appendError("\n  Esperava um dos seguintes tokens:");
@@ -183,19 +182,5 @@ public class ParserIntegration {
         message = message.replaceAll("Encountered.*at line", "Erro na linha");
         message = message.replaceAll("Was expecting:", "Esperava:");
         return message;
-    }
-    
-    private static String extractLineFromError(String errorMsg) {
-        try {
-            if (errorMsg.contains("line")) {
-                int start = errorMsg.indexOf("line") + 5;
-                int end = errorMsg.indexOf(",", start);
-                if (end == -1) end = errorMsg.indexOf(".", start);
-                if (end == -1) end = start + 5;
-                return errorMsg.substring(start, end).trim();
-            }
-        } catch (Exception e) {
-        }
-        return "desconhecida";
     }
 }

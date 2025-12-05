@@ -21,7 +21,7 @@ public class TrucoGUI extends JFrame {
     private File currentFile;
     
     public TrucoGUI() {
-        setTitle("Compilador Truco - Análise Léxica e Sintática");
+        setTitle("Compilador Truco");
         setSize(1400, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
