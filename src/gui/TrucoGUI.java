@@ -3,6 +3,9 @@ package gui;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.io.*;
@@ -278,7 +281,7 @@ public class TrucoGUI extends JFrame {
         updateStatus("Compilando...", Color.YELLOW);
         
         String code = codeEditor.getText();
-        
+
         if (code.trim().isEmpty()) {
             updateStatus("Status: Código vazio", Color.ORANGE);
             errorsArea.append("ERRO: Nenhum código para compilar.\n");
@@ -286,7 +289,8 @@ public class TrucoGUI extends JFrame {
         }
         
         try {
-            ParserIntegration.compileCode(code, this);            
+        	codeEditor.clearHighlights();
+        	ParserIntegration.compileCode(code, this);            
         } catch (Exception e) {
             updateStatus("Status: ERRO NA COMPILAÇÃO", Color.RED);
             errorsArea.append("ERRO: " + e.getMessage() + "\n");
@@ -355,4 +359,24 @@ public class TrucoGUI extends JFrame {
             updateStatus("Status: CÓDIGO REJEITADO ✗", Color.RED);
         }
     }
+
+    public void highlightError(int line, int column) {
+        try {
+            codeEditor.highlightRange(line, column, 1);
+        } catch (Exception ex) {
+        	codeEditor.highlightLine(line);
+        }
+    }
+    
+    public void highlightError(int line, int column, int len) {
+        try {
+            codeEditor.highlightRange(line, column, len);
+        } catch (Exception ex) {
+        	codeEditor.highlightLine(line);
+        }
+    }
+    
+	public void clearHighlights() {
+		codeEditor.clearHighlights();
+	}
 }

@@ -259,7 +259,9 @@ void program():
   	fechaChave()
   } catch(ParseException e) {
 	ErrorHandler.addError(formatErrorMessage(e));
+	ErrorHandler.highlightError(e);
 	consumeUntil(sinc, e, "main");
+
   }
 }
 
@@ -379,6 +381,7 @@ void termo() :
 	)
   } catch(ParseException e) {
     ErrorHandler.addError(formatErrorMessage(e));
+    ErrorHandler.highlightError(e);
 	consumeUntil(sinc, e, "termo");
   }
 }
@@ -463,6 +466,7 @@ void blocos():
 	  	bloco()
 	  } catch(ParseException e) {
 	    ErrorHandler.addError(formatErrorMessage(e));
+	    ErrorHandler.highlightError(e);
 		consumeUntil(sinc, e, "blocos");
 	  }
  	)*

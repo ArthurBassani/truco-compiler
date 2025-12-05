@@ -42,4 +42,22 @@ public class ErrorHandler {
         hasErrors = false;
         currentGUI = null;
     }
+    
+    public static void highlightError(ParseException e) {        
+    	if (currentGUI != null) {
+    		Token token = e.currentToken;
+    		if (token != null && token.next != null) {
+            	int linha = token.next.beginLine;
+                int col = token.next.beginColumn; 
+                int len = token.next.image.length();
+                currentGUI.highlightError(linha, col,len);
+            } else if (token != null) {
+            	int linha = token.beginLine;
+                int col = token.beginColumn;
+                int len = token.image.length();
+                currentGUI.highlightError(linha,col,len);
+            }
+        }
+    }
+    
 }

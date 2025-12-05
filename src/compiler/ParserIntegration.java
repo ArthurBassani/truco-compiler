@@ -149,19 +149,26 @@ public class ParserIntegration {
     private static void handleParseException(ParseException e, TrucoGUI gui) {
         Token token = e.currentToken;
         
+        gui.clearHighlights();
         if (token != null && token.next != null) {
+        	int linha = token.next.beginLine;
+            int col = token.next.beginColumn;
+            
             gui.appendError(String.format(
                 "ERRO SINTÁTICO na Linha %d, Coluna %d:",
-                token.next.beginLine,
-                token.next.beginColumn
+                linha,col
             ));
+            
+            gui.highlightError(linha, col);
             gui.appendError("  Token encontrado: " + token.next.image);
         } else if (token != null) {
-            gui.appendError(String.format(
+        	int linha = token.beginLine;
+            int col = token.beginColumn;
+        	gui.appendError(String.format(
                 "ERRO SINTÁTICO na Linha %d, Coluna %d:",
-                token.beginLine,
-                token.beginColumn
+                linha, col
             ));
+            gui.highlightError(linha,col);
         } else {
             gui.appendError("ERRO SINTÁTICO:");
             gui.appendError("  " + cleanErrorMessage(e.getMessage()));

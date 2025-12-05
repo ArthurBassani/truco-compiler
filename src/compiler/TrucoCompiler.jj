@@ -300,7 +300,9 @@ void program():
   	fechaChave()
   } catch(ParseException e) {
 	ErrorHandler.addError(formatErrorMessage(e));
+	ErrorHandler.highlightError(e);
 	consumeUntil(sinc, e, "main");
+
   }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -784,6 +786,7 @@ void termo() :
 	)
   } catch(ParseException e) {
     ErrorHandler.addError(formatErrorMessage(e));
+    ErrorHandler.highlightError(e);
 	consumeUntil(sinc, e, "termo");
   }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
@@ -1128,6 +1131,7 @@ void blocos():
 	  	bloco()
 	  } catch(ParseException e) {
 	    ErrorHandler.addError(formatErrorMessage(e));
+	    ErrorHandler.highlightError(e);
 		consumeUntil(sinc, e, "blocos");
 	  }
  	)*/*@bgen(jjtree)*/
