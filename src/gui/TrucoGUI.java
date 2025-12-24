@@ -3,9 +3,6 @@ package gui;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.io.*;
@@ -22,7 +19,8 @@ public class TrucoGUI extends JFrame {
     private JLabel lineCountLabel;
     private JFileChooser fileChooser;
     private File currentFile;
-    
+    private FileExplorerPanel fileExplorer;
+
     public TrucoGUI() {
         setTitle("Compilador Truco");
         setSize(1400, 900);
@@ -65,19 +63,36 @@ public class TrucoGUI extends JFrame {
             public void removeUpdate(javax.swing.event.DocumentEvent e) { updateStats(); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { updateStats(); }
         });
+        
+        fileExplorer = new FileExplorerPanel(file -> {
+            try {
+                String content = new String(java.nio.file.Files.readAllBytes(file.toPath()));
+                codeEditor.setText(content);
+                currentFile = file;
+                setTitle("Compilador Truco - " + file.getName());
+            } catch (Exception ex) {
+                showError("Erro ao abrir arquivo: " + ex.getMessage());
+            }
+        });
+
+        
     }
     
     private void setupLayout() {
         setLayout(new BorderLayout(5, 5));
         
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(createToolbar(), BorderLayout.NORTH);
-        topPanel.add(createEditorPanel(), BorderLayout.CENTER);
+        JSplitPane leftSplit = new JSplitPane(
+        	    JSplitPane.HORIZONTAL_SPLIT,
+        	    fileExplorer,
+        	    createEditorPanel()
+        	);
+        	leftSplit.setDividerLocation(250);
+        	leftSplit.setResizeWeight(0);
         
         JPanel bottomPanel = createBottomPanel();
         JPanel rightPanel = createRightPanel();
         
-        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topPanel, rightPanel);
+        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftSplit, rightPanel);
         mainSplitPane.setDividerLocation(900);
         mainSplitPane.setResizeWeight(0.7);
         
@@ -87,37 +102,6 @@ public class TrucoGUI extends JFrame {
         
         add(verticalSplitPane, BorderLayout.CENTER);
         add(createStatusBar(), BorderLayout.SOUTH);
-    }
-    
-    private JPanel createToolbar() {
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        toolbar.setBorder(BorderFactory.createEtchedBorder());
-        
-        JButton btnOpen = new JButton("Abrir Arquivo");
-        btnOpen.setIcon(UIManager.getIcon("FileView.directoryIcon"));
-        btnOpen.addActionListener(e -> openFile());
-        
-        JButton btnSave = new JButton("Salvar");
-        btnSave.setIcon(UIManager.getIcon("FileView.floppyDriveIcon"));
-        btnSave.addActionListener(e -> saveFile());
-        
-        JButton btnCompile = new JButton("Compilar");
-        btnCompile.setIcon(UIManager.getIcon("OptionPane.okIcon"));
-        btnCompile.setFont(new Font("Arial", Font.BOLD, 12));
-        btnCompile.setBackground(new Color(100, 200, 100));
-        btnCompile.addActionListener(e -> compile());
-        
-        JButton btnClear = new JButton("Limpar");
-        btnClear.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
-        btnClear.addActionListener(e -> clearAll());
-        
-        toolbar.add(btnOpen);
-        toolbar.add(btnSave);
-        toolbar.add(new JSeparator(SwingConstants.VERTICAL));
-        toolbar.add(btnCompile);
-        toolbar.add(btnClear);
-        
-        return toolbar;
     }
     
     private JPanel createEditorPanel() {
@@ -190,6 +174,17 @@ public class TrucoGUI extends JFrame {
         return panel;
     }
     
+    private void openDirectory() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = chooser.showOpenDialog(this);
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File dir = chooser.getSelectedFile();
+            fileExplorer.loadDirectory(dir);
+        }
+    }
+    
     private void setupMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         
@@ -197,6 +192,11 @@ public class TrucoGUI extends JFrame {
         JMenuItem openItem = new JMenuItem("Abrir");
         openItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
         openItem.addActionListener(e -> openFile());
+        
+        JMenuItem openDirItem = new JMenuItem("Abrir Diretório");
+        openDirItem.addActionListener(e -> openDirectory());
+
+        fileMenu.add(openDirItem);
         
         JMenuItem saveItem = new JMenuItem("Salvar");
         saveItem.setAccelerator(KeyStroke.getKeyStroke("control S"));
